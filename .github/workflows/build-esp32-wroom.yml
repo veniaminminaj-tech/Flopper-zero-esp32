@@ -1,0 +1,44 @@
+name: Build ESP32-WROOM safe firmware
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "FlopperZeroSafe/**"
+      - ".github/workflows/build-esp32-wroom.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Arduino CLI
+        uses: arduino/setup-arduino-cli@v2
+
+      - name: Configure ESP32 core
+        run: |
+          arduino-cli config init
+          arduino-cli core update-index
+          arduino-cli core install esp32:esp32
+
+      - name: Install libraries
+        run: |
+          arduino-cli lib install "Adafruit GFX Library"
+          arduino-cli lib install "Adafruit SSD1306"
+
+      - name: Compile for ESP32-WROOM-32
+        run: |
+          mkdir -p bin
+          arduino-cli compile --fqbn esp32:esp32:esp32 --output-dir bin FlopperZeroSafe
+
+      - name: Upload BIN artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: FlopperZeroSafe-ESP32-WROOM32
+          path: bin/*.bin
+          if-no-files-found: error
