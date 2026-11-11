@@ -20,6 +20,8 @@ const char* menuItems[] = {"Passive Wi-Fi scan", "Snake mini-game", "About"};
 const int MENU_COUNT = 3;
 int menuIndex = 0;
 int networkCount = 0;
+String networkNames[MAX_NETWORKS];
+int networkSignals[MAX_NETWORKS];
 int networkOffset = 0;
 int snakeX[40], snakeY[40], snakeLength = 3;
 int foodX = 64, foodY = 32, dirX = 1, dirY = 0;
@@ -94,12 +96,12 @@ void drawNetworks() {
       display.setCursor(0, 14 + i * 11);
       display.print(idx + 1);
       display.print(". ");
-      String name = WiFi.SSID(idx);
+      String name = networkNames[idx];
       if (name.length() == 0) name = "<hidden>";
       if (name.length() > 13) name = name.substring(0, 13);
       display.print(name);
       display.print(" ");
-      display.print(WiFi.RSSI(idx));
+      display.print(networkSignals[idx]);
     }
   }
   display.setCursor(0, 57);
@@ -158,7 +160,7 @@ void setup() {
   Serial.begin(115200);
   pinMode(JOY_SW, INPUT_PULLUP);
   analogReadResolution(12);
-  randomSeed(esp_random());
+  randomSeed(micros());
   Wire.begin();
   if (!display.begin(SSD1306_SWITCHCAPVCC, 0x3C)) {
     Serial.println("SSD1306 not found. Check wiring/address.");
