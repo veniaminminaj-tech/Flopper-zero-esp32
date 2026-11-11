@@ -79,6 +79,10 @@ void scanWiFi() {
   networkCount = WiFi.scanNetworks(false, true);
   if (networkCount < 0) networkCount = 0;
   if (networkCount > MAX_NETWORKS) networkCount = MAX_NETWORKS;
+  for (int i = 0; i < networkCount; i++) {
+    networkNames[i] = WiFi.SSID(i);
+    networkSignals[i] = WiFi.RSSI(i);
+  }
   networkOffset = 0;
   mode = WIFI_RESULTS;
   WiFi.scanDelete();
